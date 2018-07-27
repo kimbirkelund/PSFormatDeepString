@@ -334,3 +334,6 @@ ASALocalRun/
 
 
 # End of https://www.gitignore.io/api/visualstudio
+
+.store/
+nbgv\.exe

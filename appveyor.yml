@@ -17,4 +17,4 @@ for:
     - "master"
 
   deploy_script:
-  - ps: .\master_deploy_scripts.ps1
+  - ps: .\appveyor\master_deploy_scripts.ps1

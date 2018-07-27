@@ -1,5 +1,5 @@
 install:
-  ps: . .\appveyor\install.ps1
+- ps: . .\appveyor\install.ps1
 
 build_script:
 - ps: . .\appveyor\build.ps1
@@ -11,9 +11,10 @@ artifacts:
 - path: .\src\PSFormatDeepString\bin\Release\PSFormatDeepString*.nupkg;
 
 for:
+- 
   branches:
     only: 
-      - "master"
+    - "master"
 
   deploy_script:
   - ps: .\master_deploy_scripts.ps1

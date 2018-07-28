@@ -19,7 +19,8 @@ namespace PSFormatDeepString
         /// </summary>
         protected override void ProcessRecord()
         {
-            WriteObject(PrettyPrinter.Print(InputObject));
+            var result = PrettyPrinter.Print(InputObject);
+            WriteObject(result);
         }
     }
 }

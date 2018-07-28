@@ -12,8 +12,17 @@ namespace PSFormatDeepString
     {
         private static readonly string[] _excludedPropertyNames = { "Type", "Message", "InnerException", "InnerExceptions", "StackTrace", "Data" };
 
-        private readonly Dictionary<object, string> _seenObjects = new Dictionary<object, string>();
+        // @formatter:off — disable formatter after this line
+        private static readonly Type[] _simpleTypes = {
+            typeof(bool),
+            typeof(char), typeof(string),
+            typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(int), typeof(uint), typeof(ulong), typeof(long),
+            typeof(float), typeof(double), typeof(decimal),
+            typeof(Type), typeof(RuntimeTypeHandle), typeof(Uri), typeof(Version)
+        };
+        // @formatter:on — enable formatter after this line
 
+        private readonly Dictionary<object, string> _seenObjects = new Dictionary<object, string>();
         private readonly TextWriter _textWriter;
 
         private int _depth;
@@ -26,7 +35,6 @@ namespace PSFormatDeepString
         {
             _textWriter = textWriter ?? throw new ArgumentNullException(nameof(textWriter));
         }
-
 
         private void Nest([InstantHandle] [NotNull] Action action)
         {
@@ -95,30 +103,24 @@ namespace PSFormatDeepString
 
         private void WriteLine(string header, object value)
         {
+            bool IsSimple()
+            {
+                var type = value.GetType();
+                return _simpleTypes.Contains(type)
+                       || type.FullName == "System.RuntimeType"
+                       || type.FullName?.StartsWith("System.Reflection") is true
+                       || type.IsEnum;
+            }
+
             switch (value)
             {
                 case null:
-                case bool _:
-                case char _:
-                case string _:
-                case byte _:
-                case sbyte _:
-                case ushort _:
-                case short _:
-                case int _:
-                case uint _:
-                case ulong _:
-                case long _:
-                case float _:
-                case double _:
-                case decimal _:
-                case Type _:
-                case Uri _:
-                case object o when o.GetType()
-                                    .FullName?.StartsWith("System.Reflection") is true:
-                case object s when s.GetType()
-                                    .IsEnum:
+                case object _ when IsSimple():
                     WriteLine(header, value?.ToString());
+                    break;
+
+                case FileSystemInfo fsi:
+                    WriteLine(header, $"{fsi.GetType() .Name}({fsi.FullName})");
                     break;
 
                 case IDictionary dictionary:
@@ -162,7 +164,7 @@ namespace PSFormatDeepString
 
         private void WriteLine(string header, IEnumerable<string> lines = null)
         {
-            var prefix = Indentation + header + ": ";
+            var prefix = string.IsNullOrWhiteSpace(header) ? Indentation : Indentation + header + ": ";
             if (lines == null)
             {
                 _textWriter.WriteLine(prefix);
@@ -214,7 +216,7 @@ namespace PSFormatDeepString
             }
             else
             {
-                using (var e = GetPropertiesEnumerator(obj))
+                using (var e = EnumeratePropertiesWithOid(obj))
                 {
                     if (!e.MoveNext())
                     {
@@ -242,7 +244,7 @@ namespace PSFormatDeepString
                                  TextWriter textWriter)
         {
             var prettyPrinter = new PrettyPrinter(textWriter);
-            prettyPrinter.WriteObject(null, obj);
+            prettyPrinter.WriteLine(null, obj);
         }
 
         public static string Print(object obj)
@@ -252,11 +254,26 @@ namespace PSFormatDeepString
 
             var textWriter = new StringWriter();
 
-            // ReSharper disable ExplicitCallerInfoArgument
             Print(obj, textWriter);
-            // ReSharper restore ExplicitCallerInfoArgument
 
             return textWriter.ToString();
+        }
+
+        private static IEnumerator<(string key, object value)> EnumeratePropertiesWithOid(object obj)
+        {
+            using (var e = GetProperties(obj)
+                .GetEnumerator())
+            {
+                if (!e.MoveNext())
+                    yield break;
+
+                yield return ("Type", obj.GetType()
+                                         .FullName);
+
+                do
+                    yield return e.Current;
+                while (e.MoveNext());
+            }
         }
 
         private static IEnumerable<(string key, object value)> GetProperties(object obj)
@@ -282,18 +299,11 @@ namespace PSFormatDeepString
                                     .Select(p => (p.Name, p.Value)));
             }
 
-            return new (string key, object value)[]
-                   {
-                       ("Type", obj.GetType()
-                                   .FullName)
-                   }
-                .Concat(obj.GetType()
-                           .GetProperties()
-                           .Where(p => p.CanRead)
-                           .Select(p => (p.Name, p.GetValue(obj, null))));
+            return obj.GetType()
+                      .GetProperties()
+                      .Where(p => p.CanRead && p.GetIndexParameters()
+                                                .Length == 0)
+                      .Select(p => (p.Name, p.GetValue(obj, null)));
         }
-
-        private static IEnumerator<(string key, object value)> GetPropertiesEnumerator(object obj) => GetProperties(obj)
-            .GetEnumerator();
     }
 }

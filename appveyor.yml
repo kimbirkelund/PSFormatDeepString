@@ -15,6 +15,14 @@ for:
 -
   branches:
     only:
+    - "develop"
+
+  deploy_script:
+  - ps: .\appveyor\develop_deploy_scripts.ps1
+
+-
+  branches:
+    only:
     - "master"
 
   deploy_script:

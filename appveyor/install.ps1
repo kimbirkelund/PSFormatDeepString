@@ -16,7 +16,8 @@ function checkLastExitCode
 
 # Install latest PowerShellGet
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -Verbose;
-Install-Module PowerShellGet -RequiredVersion 1.6 -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser;
+Install-Module PowerShellGet -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser;
+Import-Module PowerShellGet -RequiredVersion 1.6 -Force;
 
 Get-Module PowerShellGet;
 Get-Command Update-ModuleManifest;

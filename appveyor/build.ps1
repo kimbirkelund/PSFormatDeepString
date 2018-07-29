@@ -27,34 +27,32 @@ $simpleVersion = .\nbgv get-version -f json |
     Select-Object -ExpandProperty CloudBuildAllVars |
     Select-Object -ExpandProperty NBGV_SimpleVersion;
 
-$moduleManifest = @"
-@{
-    RootModule        = "$($env:APPVEYOR_PROJECT_NAME).dll"
-
-    ModuleVersion     = "$simpleVersion"
-    GUID              = "$($env:ModuleGuid)"
-    Description       = "$(Get-Content -Raw .\README.md)"
-
-    Author            = "Kim Birkelund"
-    Copyright         = "(c) 2018 Kim Birkelund. All rights reserved."
-
-    FunctionsToExport = "*"
-    CmdletsToExport   = "*"
-    VariablesToExport = "*"
-    AliasesToExport   = "*"
-
-    PrivateData       = @{
-        PSData = @{
-            LicenseUri = "https://github.com/$($env:APPVEYOR_REPO_NAME)/blob/master/LICENSE"
-            Prerelease = "$prereleaseVersion"
-        }
-    }
-}
-"@
-
 $moduleManifestPath = Join-Path $name "$name.psd1";
-$moduleManifest |
-    Set-Content $moduleManifestPath;
+New-ModuleManifest $moduleManifestPath;
+
+Update-ModuleManifest `
+    -Path $moduleManifestPath `
+    -Description (Get-Content -Raw .\README.md) `
+    -RootModule "$($env:APPVEYOR_PROJECT_NAME).dll" `
+    -Guid $env:ModuleGuid `
+    -Author "Kim Birkelund" `
+    -CompanyName "Kim Birklund" `
+    -Copyright "(c) 2018 Kim Birkelund. All rights reserved." `
+    -ModuleVersion $simpleVersion `
+    -Prerelease $prereleaseVersion `
+    -ProjectUri "https://github.com/$($env:APPVEYOR_REPO_NAME)" `
+    -LicenseUri "https://github.com/$($env:APPVEYOR_REPO_NAME)/blob/master/LICENSE" `
+    -AliasesToExport "*" `
+    -CmdletsToExport "*" `
+    -FunctionsToExport "*" `
+    -VariablesToExport "*" `
+    -PassThru;
+
+$manifest = Test-ModuleManifest $moduleManifestPath;
+
+Update-ModuleManifest `
+    -Path $moduleManifestPath `
+    -CmdletsToExport ($manifest.ExportedCmdlets.Keys);
 
 Test-ModuleManifest $moduleManifestPath;
 

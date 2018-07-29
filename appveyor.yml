@@ -8,7 +8,8 @@ test_script:
   - ps: . .\appveyor\test.ps1
 
 artifacts:
-  - path: $(APPVEYOR_REPO_NAME)/**/*.*
+  - path: $(APPVEYOR_PROJECT_NAME)\**\*.*
+    name: PowerShellModule
 
 for:
 -

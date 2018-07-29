@@ -27,17 +27,33 @@ $simpleVersion = .\nbgv get-version -f json |
     Select-Object -ExpandProperty CloudBuildAllVars |
     Select-Object -ExpandProperty NBGV_SimpleVersion;
 
-New-ModuleManifest `
-    -Path (Join-Path $name "$name.psd1") `
-    -Guid "$env:ModuleGuid" `
-    -Author "$env:APPVEYOR_ACCOUNT_NAME" `
-    -Copyright "(c) 2018 $env:APPVEYOR_ACCOUNT_NAME. All rights reserved." `
-    -RootModule "$name.dll" `
-    -ModuleVersion $simpleVersion `
-    -Description (Get-Content -Raw .\README.md) `
-    -CmdletsToExport "*" `
-    -LicenseUri "https://github.com/$($env:APPVEYOR_REPO_NAME)/blob/master/LICENSE" `
-    -PrivateData @{ PSData = @{ Prerelease = $prereleaseVersion } };
+$moduleManifest = @"
+@{
+    RootModule        = "$($env:APPVEYOR_PROJECT_NAME).dll"
+
+    ModuleVersion     = "$simpleVersion"
+    GUID              = "$($env:ModuleGuid)"
+    Description       = "$(Get-Content -Raw .\README.md)"
+
+    Author            = "Kim Birkelund"
+    Copyright         = "(c) 2018 Kim Birkelund. All rights reserved."
+
+    FunctionsToExport = "*"
+    CmdletsToExport   = "*"
+    VariablesToExport = "*"
+    AliasesToExport   = "*"
+
+    PrivateData       = @{
+        PSData = @{
+            LicenseUri = "https://github.com/$($env:APPVEYOR_REPO_NAME)/blob/master/LICENSE"
+            Prerelease = "$prereleaseVersion"
+        }
+    }
+}
+"@
+
+$moduleManifest |
+    Set-Content (Join-Path $name "$name.psd1");
 
 Write-Host "### Dist folder ###"
 Get-ChildItem $name

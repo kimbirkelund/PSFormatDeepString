@@ -14,7 +14,7 @@ function checkLastExitCode
 }
 
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted;
-Update-Module PowerShellGet -RequiredVersion 1.6 -Confirm:$false -Force;
+Install-Module PowerShellGet -RequiredVersion 1.6 -Confirm:$false -Force -AllowClobber;
 
 dotnet tool install `
     --tool-path . `

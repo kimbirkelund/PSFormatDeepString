@@ -13,9 +13,16 @@ function checkLastExitCode
     }
 }
 
-Set-PSRepository -Name PSGallery -InstallationPolicy Trusted;
-Install-Module PowerShellGet -RequiredVersion 1.6 -Confirm:$false -Force -AllowClobber;
 
+# Install latest PowerShellGet
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -Verbose;
+Install-Module PowerShellGet -RequiredVersion 1.6 -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser;
+
+Get-Module PowerShellGet;
+Get-Command Update-ModuleManifest;
+
+
+# Install NerdBank.GitVersioning CLI and set env vars
 dotnet tool install `
     --tool-path . `
     nbgv;

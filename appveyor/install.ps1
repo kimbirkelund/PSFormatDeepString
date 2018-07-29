@@ -19,12 +19,8 @@ Set-PSRepository -Name PSGallery -InstallationPolicy Trusted;
 
 Install-Module PowerShellGet -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser -MinimumVersion 1.6.6;
 Import-Module PowerShellGet -MinimumVersion 1.6.6 -Force;
+Import-PackageProvider -Name PowerShellGet -Force -MinimumVersion 1.6.6;
 Get-Module PowerShellGet;
-
-Install-Module PackageManagement -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser -MinimumVersion 1.1.7.2;
-Import-Module PackageManagement -MinimumVersion 1.1.7.2 -Force;
-Get-Module PackageManagement;
-
 
 # Install NerdBank.GitVersioning CLI and set env vars
 dotnet tool install `

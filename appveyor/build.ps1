@@ -52,8 +52,11 @@ $moduleManifest = @"
 }
 "@
 
+$moduleManifestPath = Join-Path $name "$name.psd1";
 $moduleManifest |
-    Set-Content (Join-Path $name "$name.psd1");
+    Set-Content $moduleManifestPath;
+
+Test-ModuleManifest $moduleManifestPath;
 
 Write-Host "### Dist folder ###"
 Get-ChildItem $name

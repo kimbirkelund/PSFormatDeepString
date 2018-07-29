@@ -1,3 +1,10 @@
+[CmdletBinding()]
+PARAM()
+
+$ErrorActionPreference = "Stop";
+Set-StrictMode -Version Latest;
+
+
 # Restore pacakges
 dotnet restore src;
 checkLastExitCode;

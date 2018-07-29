@@ -1,4 +1,11 @@
-function checkLastExitCode 
+[CmdletBinding()]
+PARAM()
+
+$ErrorActionPreference = "Stop";
+Set-StrictMode -Version Latest;
+
+
+function checkLastExitCode
 {
     if ($LASTEXITCODE -ne 0)
     {

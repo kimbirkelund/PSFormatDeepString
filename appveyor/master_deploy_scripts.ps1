@@ -4,9 +4,10 @@ PARAM()
 $ErrorActionPreference = "Stop";
 Set-StrictMode -Version Latest;
 
+
 if (![string]::IsNullOrWhiteSpace($global:VersionInfo.PrereleaseVersion))
 {
-    Write-Error "Branch can only be built when version is not a prerelease version.";
+    Write-Error "Branch will only deploy when version is not a prerelease version.";
     return;
 }
 

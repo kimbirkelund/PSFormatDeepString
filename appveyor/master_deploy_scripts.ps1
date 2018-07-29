@@ -5,18 +5,22 @@ $ErrorActionPreference = "Stop";
 Set-StrictMode -Version Latest;
 
 
-# Create tag
+Write-Host "Create tag"
 .\nbgv tag;
 checkLastExitCode;
+Write-Host "/Create tag"
 
 
-# Publish module
+Write-Host "Publish module"
 Publish-Module `
     -NuGetApiKey $env:PowerShellGalleryApiKey `
     -Path $env:APPVEYOR_PROJECT_NAME `
     -Repository PSGallery `
     -Verbose;
+Write-Host "/Publish module"
 
 
-git push --tags;
+Write-Host "Push tags"
+git push origin --tags;
 checkLastExitCode;
+Write-Host "/Push tags"

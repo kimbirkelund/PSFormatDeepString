@@ -15,12 +15,15 @@ function checkLastExitCode
 
 
 # Install latest PowerShellGet
-Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -Verbose;
-Install-Module PowerShellGet -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser -MinimumVersion 1.6;
-Import-Module PowerShellGet -MinimumVersion 1.6 -Force;
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted;
 
+Install-Module PowerShellGet -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser -MinimumVersion 1.6.6;
+Import-Module PowerShellGet -MinimumVersion 1.6.6 -Force;
 Get-Module PowerShellGet;
-Get-Command Update-ModuleManifest;
+
+Install-Module PackageManagement -Confirm:$false -Force -AllowClobber -Verbose -Scope CurrentUser -MinimumVersion 1.1.7.2;
+Import-Module PackageManagement -MinimumVersion 1.1.7.2 -Force;
+Get-Module PackageManagement;
 
 
 # Install NerdBank.GitVersioning CLI and set env vars

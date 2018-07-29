@@ -29,15 +29,16 @@ Copy-Item .\src\PSFormatDeepString\bin\Release\netstandard2.0\* $name;
 Write-Host "### /Create and populate module folder"
 
 
-Write-Host "### Create module manifest"
-$prereleaseVersion = .\nbgv get-version -f json | `
-    ConvertFrom-Json | `
-    Select-Object -ExpandProperty PrereleaseVersion;
+Write-Host "### Get and store version info using nbgv"
+$getVersionPs1 = Get-ChildItem -Recurse "~\.nuget\packages\nerdbank.gitversioning\*\tools\Get-Version.ps1" | Select-Object -First 1;
+$global:VersionInfo = & $getVersionPs1;
 
-$simpleVersion = .\nbgv get-version -f json |
-    ConvertFrom-Json |
-    Select-Object -ExpandProperty CloudBuildAllVars |
-    Select-Object -ExpandProperty NBGV_SimpleVersion;
+Write-Host "/### Get and store version info using nbgv"
+
+
+Write-Host "### Create module manifest"
+$prereleaseVersion = $global:VersionInfo.PrereleaseVersion;
+$simpleVersion = $global:VersionInfo.SimpleVersion;
 
 $moduleManifestPath = Join-Path $name "$name.psd1";
 New-ModuleManifest $moduleManifestPath;

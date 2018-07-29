@@ -5,31 +5,31 @@ $ErrorActionPreference = "Stop";
 Set-StrictMode -Version Latest;
 
 
-Write-Host "Restore pacakges"
+Write-Host "### Restore pacakges"
 dotnet restore src;
 checkLastExitCode;
-Write-Host "/Restore pacakges"
+Write-Host "### /Restore pacakges"
 
 
-Write-Host "Build code"
+Write-Host "### Build code"
 dotnet build src `
     --no-restore `
     --configuration Release;
 checkLastExitCode;
-Write-Host "/Build code"
+Write-Host "### /Build code"
 
 
-Write-Host "Create and populate module folder"
+Write-Host "### Create and populate module folder"
 $name = $env:APPVEYOR_PROJECT_NAME;
 
 Remove-Item $name -Recurse -Force -ErrorAction SilentlyContinue;
 New-Item -ItemType Directory $name;
 
 Copy-Item .\src\PSFormatDeepString\bin\Release\netstandard2.0\* $name;
-Write-Host "/Create and populate module folder"
+Write-Host "### /Create and populate module folder"
 
 
-Write-Host "Create module manifest"
+Write-Host "### Create module manifest"
 $prereleaseVersion = .\nbgv get-version -f json | `
     ConvertFrom-Json | `
     Select-Object -ExpandProperty PrereleaseVersion;
@@ -67,9 +67,9 @@ Update-ModuleManifest `
     -CmdletsToExport ($manifest.ExportedCmdlets.Keys);
 
 Test-ModuleManifest $moduleManifestPath;
-Write-Host "/Create module manifest"
+Write-Host "### /Create module manifest"
 
 
-Write-Host "Dist folder"
+Write-Host "### Dist folder"
 Get-ChildItem $name
-Write-Host "/Dist folder"
+Write-Host "### /Dist folder"

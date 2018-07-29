@@ -38,3 +38,7 @@ New-ModuleManifest `
     -CmdletsToExport "*" `
     -LicenseUri "https://github.com/$($env:APPVEYOR_REPO_NAME)/blob/master/LICENSE" `
     -PrivateData @{ Prerelease = $prereleaseVersion };
+
+Write-Host "### Dist folder ###"
+Get-ChildItem $name
+Write-Host "### /Dist folder ###"
